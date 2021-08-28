@@ -5,4 +5,5 @@ https://www.bilibili.com/video/BV1Mv411K7sJ/?spm_id_from=333.788.recommend_more_
 
 ![image](./1.jpg)
 
-[Play](https://htmlpreview.github.io/?https://github.com/pengliheng/game/blob/master/Breakout%20clone/index.html)
+[PC Play](https://htmlpreview.github.io/?https://github.com/pengliheng/game/blob/master/BreakoutPC/index.html)
+[Mobile Play](https://htmlpreview.github.io/?https://github.com/pengliheng/game/blob/master/BreakoutMobile/index.html)

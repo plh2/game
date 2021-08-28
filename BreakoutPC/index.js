@@ -1,4 +1,4 @@
-const canvas = document.querySelector('canvas');
+const canvas = document.querySelector("canvas");
 const ctx = canvas.getContext("2d");
 let root;
 class Brick {
@@ -23,7 +23,7 @@ class Brick {
         ctx.stroke();
     }
     destory() {
-        root.data.bricks = root.data.bricks.filter(brick => brick!== this)
+        root.data.bricks = root.data.bricks.filter((brick) => brick !== this);
         if (Math.random() < root.data.foodGenerateRate) {
             root.data.foods.push(new Food(this.x, this.y));
         }
@@ -31,7 +31,7 @@ class Brick {
 }
 
 class Ball {
-    constructor({ x, y, direct = Math.random()*2 }) {
+    constructor({ x, y, direct = Math.random() * 2 }) {
         this.x = x;
         this.y = y;
         // 0    →
@@ -63,7 +63,7 @@ class Ball {
         }
         // boundary down
         if (this.y > root.data.height) {
-            this.destory()
+            this.destory();
             return;
         }
         return false;
@@ -105,7 +105,7 @@ class Ball {
         return false;
     }
     destory() {
-        root.data.balls = root.data.balls.filter(ball => ball!== this)
+        root.data.balls = root.data.balls.filter((ball) => ball !== this);
     }
     paddleCollision() {
         this.direct += 2;
@@ -120,9 +120,9 @@ class Ball {
             const effect = (0.5 - (this.x - paddle.x) / paddle.width) / 2;
             if (this.direct > 1 && this.direct < 2) {
                 function format(deg) {
-                    if (deg<0.2) return 0.2
-                    if (deg>0.8) return 0.8
-                    return deg
+                    if (deg < 0.2) return 0.2;
+                    if (deg > 0.8) return 0.8;
+                    return deg;
                 }
                 this.direct = format(2 - this.direct + effect);
                 return true;
@@ -144,8 +144,8 @@ class Ball {
         ctx.fill();
     }
     split() {
-        if(root.data.balls.length < 400) {
-            root.data.balls.push(new Ball({...this, direct: undefined }))
+        if (root.data.balls.length < 400) {
+            root.data.balls.push(new Ball({ ...this, direct: undefined }));
         }
     }
 }
@@ -161,7 +161,7 @@ class Food {
     paddleCollision() {
         const paddle = root.data.paddle;
         if (
-            paddle.x <= this.x+this.size &&
+            paddle.x <= this.x + this.size &&
             this.x <= paddle.x + paddle.width &&
             paddle.y <= this.y + this.size &&
             paddle.y + paddle.height >= this.y + this.size
@@ -173,24 +173,24 @@ class Food {
     move() {
         if (this.y > root.data.height) {
             this.destory();
-            return
+            return;
         }
         if (!this.paddleCollision()) {
             this.y += this.speed;
         } else {
             if (this.type === 0) {
-                root.addBall()
+                root.addBall();
             }
             if (this.type === 1) {
-                root.addBall()
-                root.addBall()
+                root.addBall();
+                root.addBall();
             }
             if (this.type === 2) {
-                root.multipleBall()
+                root.multipleBall();
             }
             if (this.type === 3) {
-                root.multipleBall()
-                root.multipleBall()
+                root.multipleBall();
+                root.multipleBall();
             }
             this.destory();
         }
@@ -232,7 +232,14 @@ class Paddle {
         document.addEventListener(
             "mousemove",
             ($event) => {
-                this.x = $event.x / window.innerWidth * root.data.width - this.width/2
+                let nextLeft =
+                    ($event.x / window.innerWidth) * root.data.width -
+                    this.width / 2;
+                let nextRight = ($event.x / window.innerWidth) * root.data.width;
+                if (nextLeft < 0) nextLeft = 0;
+                if (nextRight > root.data.width - this.width / 2)
+                    nextLeft = root.data.width - this.width;
+                this.x = nextLeft;
             },
             false
         );
@@ -269,7 +276,10 @@ root = {
         timer: null,
     },
     init() {
-        this.data.paddle = new Paddle(this.data.width/2, this.data.height - 20)
+        this.data.paddle = new Paddle(
+            this.data.width / 2,
+            this.data.height - 20
+        );
         Array(12)
             .fill(1)
             .forEach((_, j) => {
@@ -279,7 +289,7 @@ root = {
                         this.data.bricks.push(new Brick(i * 10, j * 10, 1));
                     });
             });
-        this.addBall()
+        this.addBall();
         canvas.width = this.data.width;
         canvas.height = this.data.height;
         this.data.timer = setInterval(() => {
@@ -288,20 +298,20 @@ root = {
             this.drawBrick();
             this.drawFood();
             this.data.paddle.draw();
-            this.isLost()
-            this.isWin()
+            this.isLost();
+            this.isWin();
         }, this.data.refreshSpeed);
     },
     isWin() {
         if (this.data.bricks.length === 0) {
             clearInterval(this.data.timer);
-            alert("you win")
+            alert("you win");
         }
     },
     isLost() {
         if (this.data.balls.length === 0) {
             clearInterval(this.data.timer);
-            alert("you lost")
+            // alert("you lost")
         }
     },
     drawBackground() {
@@ -322,22 +332,24 @@ root = {
     drawBrick() {
         this.data.bricks.forEach((brick) => brick.draw());
     },
-    drawFood () {
+    drawFood() {
         this.data.foods.forEach((food) => {
             food.move();
             food.draw();
         });
     },
     addBall() {
-        this.data.balls.push(new Ball({
-            x: this.data.paddle.x + this.data.paddle.width / 2,
-            y: this.data.paddle.y,
-            direct: (Math.random()-0.5)/2 +0.5,
-        }))
+        this.data.balls.push(
+            new Ball({
+                x: this.data.paddle.x + this.data.paddle.width / 2,
+                y: this.data.paddle.y,
+                direct: (Math.random() - 0.5) / 2 + 0.5,
+            })
+        );
     },
     multipleBall() {
-        this.data.balls.forEach(ball => ball.split())
-    }
+        this.data.balls.forEach((ball) => ball.split());
+    },
 };
 
 root.init();

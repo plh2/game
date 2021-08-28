@@ -1,4 +1,5 @@
-let ctx;
+const canvas = document.querySelector('canvas');
+const ctx = canvas.getContext("2d");
 let root;
 class Brick {
     constructor(x, y, l = 3) {
@@ -229,15 +230,9 @@ class Paddle {
     }
     eventListener() {
         document.addEventListener(
-            "keydown",
+            "mousemove",
             ($event) => {
-                const code = $event.keyCode;
-                if (code === 37) {
-                    this.move(false);
-                }
-                if (code === 39) {
-                    this.move(true);
-                }
+                this.x = $event.x / window.innerWidth * root.data.width - this.width/2
             },
             false
         );
@@ -263,7 +258,6 @@ class Paddle {
 
 root = {
     data: {
-        ctx: document.querySelector("canvas"),
         balls: [],
         bricks: [],
         foods: [],
@@ -272,6 +266,7 @@ root = {
         width: 1100,
         height: 600,
         paddle: null,
+        timer: null,
     },
     init() {
         this.data.paddle = new Paddle(this.data.width/2, this.data.height - 20)
@@ -285,20 +280,31 @@ root = {
                     });
             });
         this.addBall()
-        this.data.ctx.width = this.data.width;
-        this.data.ctx.height = this.data.height;
-        this.data.ctx = this.data.ctx.getContext("2d");
-        ctx = this.data.ctx;
-        this.timer = setInterval(() => {
+        canvas.width = this.data.width;
+        canvas.height = this.data.height;
+        this.data.timer = setInterval(() => {
             this.drawBackground();
             this.ballMove();
             this.drawBrick();
             this.drawFood();
             this.data.paddle.draw();
+            this.isLost()
+            this.isWin()
         }, this.data.refreshSpeed);
     },
+    isWin() {
+        if (this.data.bricks.length === 0) {
+            clearInterval(this.data.timer);
+            alert("you win")
+        }
+    },
+    isLost() {
+        if (this.data.balls.length === 0) {
+            clearInterval(this.data.timer);
+            alert("you lost")
+        }
+    },
     drawBackground() {
-        const ctx = this.data.ctx;
         ctx.beginPath();
         ctx.fillStyle = "black";
         ctx.fillRect(0, 0, this.data.width, this.data.height);

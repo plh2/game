@@ -143,7 +143,7 @@ class Ball {
         ctx.fill();
     }
     split() {
-        if(root.data.balls.length < 200) {
+        if(root.data.balls.length < 400) {
             root.data.balls.push(new Ball({...this, direct: undefined }))
         }
     }

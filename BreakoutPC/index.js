@@ -1,6 +1,21 @@
 const canvas = document.querySelector("canvas");
 const ctx = canvas.getContext("2d");
 let root;
+
+class Audio {
+    constructor() {
+        this.init()
+    }
+    async init() {
+        const audio = document.createElement("audio")
+        audio.src="./hit.wav"
+        document.body.appendChild(audio)
+        audio.autoplay="true"
+        audio.addEventListener("ended", () => {
+            audio.remove()
+        })
+    }
+}
 class Brick {
     constructor(x, y, l = 3) {
         this.x = x;
@@ -10,14 +25,14 @@ class Brick {
     }
     draw() {
         ctx.beginPath();
-        if (this.level === 3) {
+        if (this.level >= 3) {
             ctx.fillStyle = "#999";
         }
         if (this.level === 2) {
-            ctx.fillStyle = "#666";
+            ctx.fillStyle = "#e60109";
         }
         if (this.level === 1) {
-            ctx.fillStyle = "#333";
+            ctx.fillStyle = "#16ff05";
         }
         ctx.fillRect(this.x + 1, this.y + 1, this.size - 1, this.size - 1);
         ctx.stroke();
@@ -80,6 +95,7 @@ class Ball {
                 this.y - this.size < brick.y + brick.size
             ) {
                 this.direct = 2 - this.direct;
+                new Audio()
                 if (brick.level > 1) {
                     brick.level--;
                 } else {
@@ -93,6 +109,7 @@ class Ball {
                 brick.x < this.x + this.size &&
                 this.x - this.size < brick.x + brick.size
             ) {
+                new Audio()
                 this.direct = 1 - this.direct;
                 if (brick.level > 1) {
                     brick.level--;
@@ -119,6 +136,7 @@ class Ball {
         ) {
             const effect = (0.5 - (this.x - paddle.x) / paddle.width) / 2;
             if (this.direct > 1 && this.direct < 2) {
+                new Audio()
                 function format(deg) {
                     if (deg < 0.2) return 0.2;
                     if (deg > 0.8) return 0.8;
@@ -275,20 +293,22 @@ root = {
         paddle: null,
         timer: null,
     },
-    init() {
+    async init() {
         this.data.paddle = new Paddle(
             this.data.width / 2,
             this.data.height - 20
         );
-        Array(12)
-            .fill(1)
-            .forEach((_, j) => {
-                Array(this.data.width / 10)
-                    .fill(1)
-                    .forEach((_, i) => {
-                        this.data.bricks.push(new Brick(i * 10, j * 10, 1));
-                    });
-            });
+        const data = await fetch('./map_standard.json').then(data=> data.json())
+        data.forEach(e => this.data.bricks.push(new Brick(e.x, e.y, e.level, e.size)))
+        // Array(12)
+        //     .fill(1)
+        //     .forEach((_, j) => {
+        //         Array(this.data.width / 10)
+        //             .fill(1)
+        //             .forEach((_, i) => {
+        //                 this.data.bricks.push(new Brick(i * 10, j * 10, 1));
+        //             });
+        //     });
         this.addBall();
         canvas.width = this.data.width;
         canvas.height = this.data.height;

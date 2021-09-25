@@ -306,7 +306,7 @@ root = {
         data.forEach(e => this.data.bricks.push(new Brick(e.x, e.y, e.level, e.size)))
     },
     async init() {
-        this.initMap();
+        await this.initMap();
         this.data.paddle = new Paddle(
             this.data.width / 2,
             this.data.height - 20
@@ -323,6 +323,9 @@ root = {
             this.isLost();
             this.isWin();
         }, this.data.refreshSpeed);
+        window.addEventListener("beforeunload", function(event) {
+            clearInterval(this.data.timer);
+        });
     },
     isWin() {
         if (this.data.bricks.length === 0) {

@@ -336,7 +336,10 @@ root = {
     isLost() {
         if (this.data.balls.length === 0) {
             clearInterval(this.data.timer);
-            // alert("you lost")
+            this.data.balls = [];
+            this.data.bricks = [];
+            this.data.foods = [];
+            this.init()
         }
     },
     drawBackground() {

@@ -17,5 +17,5 @@ https://www.bilibili.com/video/BV1Mv411K7sJ/?spm_id_from=333.788.recommend_more_
 
 6. click **store map** button, to store current map data in local storage
 
-7. open [PC Play](https://htmlpreview.github.io/?https://github.com/pengliheng/game/blob/master/BreakoutPC), to play the game with the map which create by you just now.
+7. open [PC Play](https://htmlpreview.github.io/?https://github.com/pengliheng/game/blob/master/BreakoutPC/index.html), to play the game with the map which create by you just now.
 

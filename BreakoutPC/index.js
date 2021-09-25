@@ -282,6 +282,9 @@ class Paddle {
 }
 
 root = {
+    constants: {
+        BRICKS_MAP: 'bricks_map'
+    },
     data: {
         balls: [],
         bricks: [],
@@ -293,22 +296,21 @@ root = {
         paddle: null,
         timer: null,
     },
+    async initMap() {
+        let data = localStorage.getItem(this.constants.BRICKS_MAP)
+        if (data) {
+            data = JSON.parse(data)
+        } else {
+            data = await fetch('./map_standard.json').then(data=> data.json())
+        }
+        data.forEach(e => this.data.bricks.push(new Brick(e.x, e.y, e.level, e.size)))
+    },
     async init() {
+        this.initMap();
         this.data.paddle = new Paddle(
             this.data.width / 2,
             this.data.height - 20
         );
-        const data = await fetch('./map_standard.json').then(data=> data.json())
-        data.forEach(e => this.data.bricks.push(new Brick(e.x, e.y, e.level, e.size)))
-        // Array(12)
-        //     .fill(1)
-        //     .forEach((_, j) => {
-        //         Array(this.data.width / 10)
-        //             .fill(1)
-        //             .forEach((_, i) => {
-        //                 this.data.bricks.push(new Brick(i * 10, j * 10, 1));
-        //             });
-        //     });
         this.addBall();
         canvas.width = this.data.width;
         canvas.height = this.data.height;

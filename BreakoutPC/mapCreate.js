@@ -46,7 +46,20 @@ root = {
         timer: null,
         rate: 1
     },
+    async initMap() {
+        let data = localStorage.getItem(this.constants.BRICKS_MAP)
+        if (data) {
+            data = JSON.parse(data)
+        } else {
+            data = await fetch('./map_standard.json').then(data=> data.json())
+        }
+        data.forEach(e => {
+            this[`${e.x/10}_${e.y/10}`] = true
+            this.data.bricks.push(new Brick(e.x, e.y, e.level, e.size))
+        })
+    },
     async init() {
+        await this.initMap()
         this.data.rate = canvas.offsetWidth/this.data.width
         this.eventBind()
         canvas.width = this.data.width;
@@ -95,7 +108,10 @@ root = {
                 this.addBrick($event)
             }
         })
-        cleanBtn.addEventListener("click", () => {this.data.bricks = []})
+        cleanBtn.addEventListener("click", () => {
+            this.data.bricks = []
+            localStorage.clear(this.constants.BRICKS_MAP)
+        })
         storeBtn.addEventListener("click", () => {
             console.log(this.data.bricks);
             localStorage.setItem(this.constants.BRICKS_MAP, JSON.stringify(this.data.bricks))

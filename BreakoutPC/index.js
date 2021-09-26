@@ -55,7 +55,7 @@ class Ball {
         // 1.5  ↓
         this.direct = direct;
         this.speed = 1;
-        this.size = 3;
+        this.size = 7;
         this.root = root;
     }
     boundaryCollision() {
@@ -88,35 +88,37 @@ class Ball {
         this.direct %= 2;
         for (let i = 0; i < root.data.bricks.length; i++) {
             const brick = root.data.bricks[i];
-            if (
-                brick.x < this.x &&
-                this.x < brick.x + brick.size &&
-                brick.y < this.y + this.size &&
-                this.y - this.size < brick.y + brick.size
-            ) {
-                this.direct = 2 - this.direct;
+            // this -> ball
+            const ball = this
+            // up down collision check
+            const closestPointX = ball.x < brick.x ? brick.x : (ball.x < brick.x + brick.size ? ball.x : brick.x + brick.size)
+            const closestPointY = ball.y < brick.y ? brick.y : (ball.y < brick.y + brick.size ? ball.y : brick.y + brick.size)
+            var distance = Math.sqrt(Math.pow(closestPointX - ball.x, 2) + Math.pow(closestPointY - ball.y, 2))
+            if(distance <= ball.size) {
+                // console.log(distance, ball.size);
+                // 1. reset ball position
+                // 2. turn around the ball position
+                // direct 向量
+                const d_x1 = Math.cos(this.direct * Math.PI)
+                const d_y1 = -Math.sin(this.direct * Math.PI)
+                // 法线 向量
+                // direct 向量
+                const d_x2 = (ball.x - closestPointX) / ball.size
+                const d_y2 = (ball.y - closestPointY) / ball.size
+                const d_x3 = d_x1 + d_x2*2
+                const d_y3 = d_y1 + d_y2*2 
+                const xy = Math.sqrt(d_x2*d_x2 + d_y2*d_y2)
+                ball.x = closestPointX - (ball.size / xy * Math.abs(d_x2))
+                ball.y = closestPointY + (ball.size / xy * Math.abs(d_y2))
+                this.direct = Math.atan2(-d_y3, d_x3) / Math.PI + 2
+                console.log(this.direct);
                 new Audio()
                 if (brick.level > 1) {
                     brick.level--;
                 } else {
                     brick.destory();
                 }
-                return true;
-            }
-            if (
-                brick.y < this.y &&
-                this.y < brick.y + brick.size &&
-                brick.x < this.x + this.size &&
-                this.x - this.size < brick.x + brick.size
-            ) {
-                new Audio()
-                this.direct = 1 - this.direct;
-                if (brick.level > 1) {
-                    brick.level--;
-                } else {
-                    brick.destory();
-                }
-                return true;
+                return true 
             }
         }
         return false;
@@ -151,9 +153,9 @@ class Ball {
     move() {
         this.x += this.speed * Math.cos(this.direct * Math.PI);
         this.y -= this.speed * Math.sin(this.direct * Math.PI);
-        if (this.brickCollision()) return;
         if (this.paddleCollision()) return;
         if (this.boundaryCollision()) return;
+        if (this.brickCollision()) return;
     }
     draw() {
         ctx.beginPath();
@@ -371,7 +373,8 @@ root = {
             new Ball({
                 x: this.data.paddle.x + this.data.paddle.width / 2,
                 y: this.data.paddle.y,
-                direct: (Math.random() - 0.5) / 2 + 0.5,
+                direct: 0.6,
+                // direct: (Math.random() - 0.5) / 2 + 0.5,
             })
         );
     },

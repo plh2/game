@@ -4,16 +4,16 @@ let root;
 
 class Audio {
     constructor() {
-        this.init()
+        this.init();
     }
     async init() {
-        const audio = document.createElement("audio")
-        audio.src="./hit.wav"
-        document.body.appendChild(audio)
-        audio.autoplay="true"
+        const audio = document.createElement("audio");
+        audio.src = "./hit.wav";
+        document.body.appendChild(audio);
+        audio.autoplay = "true";
         audio.addEventListener("ended", () => {
-            audio.remove()
-        })
+            audio.remove();
+        });
     }
 }
 class Brick {
@@ -41,131 +41,6 @@ class Brick {
         root.data.bricks = root.data.bricks.filter((brick) => brick !== this);
         if (Math.random() < root.data.foodGenerateRate) {
             root.data.foods.push(new Food(this.x, this.y));
-        }
-    }
-}
-
-class Ball {
-    constructor({ x, y, direct = Math.random() * 2 }) {
-        this.x = x;
-        this.y = y;
-        // 0    →
-        // 0.5  ↑
-        // 1    ←
-        // 1.5  ↓
-        this.direct = direct;
-        this.speed = 1;
-        this.size = 7;
-        this.root = root;
-    }
-    boundaryCollision() {
-        this.direct += 2;
-        this.direct %= 2;
-        // boundary left
-        if (this.x - this.size < 0) {
-            this.direct = 1 - this.direct;
-            return true;
-        }
-        // boundary right
-        if (this.x + this.size > root.data.width) {
-            this.direct = 1 - this.direct;
-            return true;
-        }
-        // boundary top
-        if (this.y - this.size < 0) {
-            this.direct = 2 - this.direct;
-            return true;
-        }
-        // boundary down
-        if (this.y > root.data.height) {
-            this.destory();
-            return;
-        }
-        return false;
-    }
-    brickCollision() {
-        this.direct += 2;
-        this.direct %= 2;
-        for (let i = 0; i < root.data.bricks.length; i++) {
-            const brick = root.data.bricks[i];
-            // this -> ball
-            const ball = this
-            // up down collision check
-            const closestPointX = ball.x < brick.x ? brick.x : (ball.x < brick.x + brick.size ? ball.x : brick.x + brick.size)
-            const closestPointY = ball.y < brick.y ? brick.y : (ball.y < brick.y + brick.size ? ball.y : brick.y + brick.size)
-            var distance = Math.sqrt(Math.pow(closestPointX - ball.x, 2) + Math.pow(closestPointY - ball.y, 2))
-            if(distance <= ball.size) {
-                // console.log(distance, ball.size);
-                // 1. reset ball position
-                // 2. turn around the ball position
-                // direct 向量
-                const d_x1 = Math.cos(this.direct * Math.PI)
-                const d_y1 = -Math.sin(this.direct * Math.PI)
-                // 法线 向量
-                // direct 向量
-                const d_x2 = (ball.x - closestPointX) / ball.size
-                const d_y2 = (ball.y - closestPointY) / ball.size
-                const d_x3 = d_x1 + d_x2*2
-                const d_y3 = d_y1 + d_y2*2 
-                const xy = Math.sqrt(d_x2*d_x2 + d_y2*d_y2)
-                ball.x = closestPointX - (ball.size / xy * Math.abs(d_x2))
-                ball.y = closestPointY + (ball.size / xy * Math.abs(d_y2))
-                this.direct = Math.atan2(-d_y3, d_x3) / Math.PI + 2
-                console.log(this.direct);
-                new Audio()
-                if (brick.level > 1) {
-                    brick.level--;
-                } else {
-                    brick.destory();
-                }
-                return true 
-            }
-        }
-        return false;
-    }
-    destory() {
-        root.data.balls = root.data.balls.filter((ball) => ball !== this);
-    }
-    paddleCollision() {
-        this.direct += 2;
-        this.direct %= 2;
-        const paddle = root.data.paddle;
-        if (
-            paddle.x < this.x + this.size &&
-            this.x < paddle.x + paddle.width &&
-            paddle.y < this.y + this.size &&
-            paddle.y + paddle.height > this.y + this.size
-        ) {
-            const effect = (0.5 - (this.x - paddle.x) / paddle.width) / 2;
-            if (this.direct > 1 && this.direct < 2) {
-                new Audio()
-                function format(deg) {
-                    if (deg < 0.2) return 0.2;
-                    if (deg > 0.8) return 0.8;
-                    return deg;
-                }
-                this.direct = format(2 - this.direct + effect);
-                return true;
-            }
-        }
-        return false;
-    }
-    move() {
-        this.x += this.speed * Math.cos(this.direct * Math.PI);
-        this.y -= this.speed * Math.sin(this.direct * Math.PI);
-        if (this.paddleCollision()) return;
-        if (this.boundaryCollision()) return;
-        if (this.brickCollision()) return;
-    }
-    draw() {
-        ctx.beginPath();
-        ctx.fillStyle = "white";
-        ctx.arc(this.x + 1, this.y, this.size, 0, 2 * Math.PI);
-        ctx.fill();
-    }
-    split() {
-        if (root.data.balls.length < 400) {
-            root.data.balls.push(new Ball({ ...this, direct: undefined }));
         }
     }
 }
@@ -255,7 +130,8 @@ class Paddle {
                 let nextLeft =
                     ($event.x / window.innerWidth) * root.data.width -
                     this.width / 2;
-                let nextRight = ($event.x / window.innerWidth) * root.data.width;
+                let nextRight =
+                    ($event.x / window.innerWidth) * root.data.width;
                 if (nextLeft < 0) nextLeft = 0;
                 if (nextRight > root.data.width - this.width / 2)
                     nextLeft = root.data.width - this.width;
@@ -283,29 +159,198 @@ class Paddle {
     }
 }
 
+class Ball {
+    constructor({ x, y, direct = Math.random() * 2 }) {
+        this.x = x;
+        this.y = y;
+        // 0    →
+        // 0.5  ↑
+        // 1    ←
+        // 1.5  ↓
+        this.direct = direct;
+        this.speed = 1;
+        this.size = 7;
+        this.root = root;
+    }
+    boundaryCollision() {
+        this.direct += 2;
+        this.direct %= 2;
+        // boundary left
+        if (this.x - this.size < 0) {
+            this.direct = 1 - this.direct;
+            return true;
+        }
+        // boundary right
+        if (this.x + this.size > root.data.width) {
+            this.direct = 1 - this.direct;
+            return true;
+        }
+        // boundary top
+        if (this.y - this.size < 0) {
+            this.direct = 2 - this.direct;
+            return true;
+        }
+        // boundary down
+        if (this.y > root.data.height) {
+            this.destory();
+            return;
+        }
+        return false;
+    }
+    isLeft(a, b) {
+        // 判断点c是否在线段ab的左侧
+        return a.x;
+    }
+    brickCollision() {
+        this.direct += 2;
+        this.direct %= 2;
+        for (let i = 0; i < root.data.bricks.length; i++) {
+            const brick = root.data.bricks[i];
+            // this -> ball
+            const ball = this;
+            // up down collision check
+            const closestPointX =
+                ball.x < brick.x
+                    ? brick.x
+                    : ball.x < brick.x + brick.size
+                    ? ball.x
+                    : brick.x + brick.size;
+            const closestPointY =
+                ball.y < brick.y
+                    ? brick.y
+                    : ball.y < brick.y + brick.size
+                    ? ball.y
+                    : brick.y + brick.size;
+            var distance = Math.sqrt(
+                Math.pow(closestPointX - ball.x, 2) +
+                    Math.pow(closestPointY - ball.y, 2)
+            );
+            if (distance <= ball.size) {
+                // console.log(distance, ball.size);
+                // 1. reset ball position
+                // 2. turn around the ball position
+                // direct 向量
+                const d_x1 = Math.cos(this.direct * Math.PI);
+                const d_y1 = -Math.sin(this.direct * Math.PI);
+                // 法线 向量
+                // direct 向量
+                const d_x2 = (ball.x - closestPointX) / ball.size;
+                const d_y2 = (ball.y - closestPointY) / ball.size;
+                const d_x3 = d_x1 + d_x2 * 2;
+                const d_y3 = d_y1 + d_y2 * 2;
+                const xy = Math.sqrt(d_x2 * d_x2 + d_y2 * d_y2);
+                if (closestPointX === ball.x) {
+                    if (closestPointY < ball.y) {
+                        ball.x =
+                            closestPointX - (ball.size / xy) * Math.abs(d_x2);
+                        ball.y =
+                            closestPointY + (ball.size / xy) * Math.abs(d_y2);
+                    } else {
+                        ball.x =
+                            closestPointX + (ball.size / xy) * Math.abs(d_x2);
+                        ball.y =
+                            closestPointY - (ball.size / xy) * Math.abs(d_y2);
+                    }
+                } else {
+                    if (closestPointX < ball.x) {
+                        ball.x =
+                            closestPointX + (ball.size / xy) * Math.abs(d_x2);
+                        ball.y =
+                            closestPointY - (ball.size / xy) * Math.abs(d_y2);
+                    } else {
+                        ball.x =
+                            closestPointX - (ball.size / xy) * Math.abs(d_x2);
+                        ball.y =
+                            closestPointY + (ball.size / xy) * Math.abs(d_y2);
+                    }
+                }
+                this.direct = Math.atan2(-d_y3, d_x3) / Math.PI + 2;
+                console.log(this.direct);
+                new Audio();
+                if (brick.level > 1) {
+                    brick.level--;
+                } else {
+                    brick.destory();
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+    destory() {
+        root.data.balls = root.data.balls.filter((ball) => ball !== this);
+    }
+    paddleCollision() {
+        this.direct += 2;
+        this.direct %= 2;
+        const paddle = root.data.paddle;
+        if (
+            paddle.x < this.x + this.size &&
+            this.x < paddle.x + paddle.width &&
+            paddle.y < this.y + this.size &&
+            paddle.y + paddle.height > this.y + this.size
+        ) {
+            const effect = (0.5 - (this.x - paddle.x) / paddle.width) / 2;
+            if (this.direct > 1 && this.direct < 2) {
+                new Audio();
+                function format(deg) {
+                    if (deg < 0.2) return 0.2;
+                    if (deg > 0.8) return 0.8;
+                    return deg;
+                }
+                this.direct = format(2 - this.direct + effect);
+                return true;
+            }
+        }
+        return false;
+    }
+    move() {
+        this.x += this.speed * Math.cos(this.direct * Math.PI);
+        this.y -= this.speed * Math.sin(this.direct * Math.PI);
+        if (this.paddleCollision()) return;
+        if (this.boundaryCollision()) return;
+        if (this.brickCollision()) return;
+    }
+    draw() {
+        ctx.beginPath();
+        ctx.fillStyle = "white";
+        ctx.arc(this.x + 1, this.y, this.size, 0, 2 * Math.PI);
+        ctx.fill();
+    }
+    split() {
+        if (root.data.balls.length < 400) {
+            root.data.balls.push(new Ball({ ...this, direct: undefined }));
+        }
+    }
+}
+
 root = {
     constants: {
-        BRICKS_MAP: 'bricks_map'
+        BRICKS_MAP: "bricks_map",
     },
     data: {
         balls: [],
         bricks: [],
         foods: [],
         foodGenerateRate: 0.6,
-        refreshSpeed: 1,
+        refreshSpeed: 15,
         width: 1100,
         height: 600,
         paddle: null,
         timer: null,
     },
     async initMap() {
-        let data = localStorage.getItem(this.constants.BRICKS_MAP)
+        let data = localStorage.getItem(this.constants.BRICKS_MAP);
         if (data) {
-            data = JSON.parse(data)
+            data = JSON.parse(data);
         } else {
-            data = await fetch('./map_standard.json').then(data=> data.json())
+            data = await fetch("./map_standard.json").then((data) =>
+                data.json()
+            );
         }
-        data.forEach(e => this.data.bricks.push(new Brick(e.x, e.y, e.level, e.size)))
+        data.forEach((e) =>
+            this.data.bricks.push(new Brick(e.x, e.y, e.level, e.size))
+        );
     },
     async init() {
         await this.initMap();
@@ -322,10 +367,10 @@ root = {
             this.drawBrick();
             this.drawFood();
             this.data.paddle.draw();
-            this.isLost();
             this.isWin();
+            this.isLost();
         }, this.data.refreshSpeed);
-        window.addEventListener("beforeunload", function(event) {
+        window.addEventListener("beforeunload", function (event) {
             clearInterval(this.data.timer);
         });
     },
@@ -341,7 +386,7 @@ root = {
             this.data.balls = [];
             this.data.bricks = [];
             this.data.foods = [];
-            this.init()
+            this.init();
         }
     },
     drawBackground() {
@@ -371,9 +416,11 @@ root = {
     addBall() {
         this.data.balls.push(
             new Ball({
+                // x: this.data.paddle.x + this.data.paddle.width / 2,
+                // y: this.data.paddle.y,
                 x: this.data.paddle.x + this.data.paddle.width / 2,
-                y: this.data.paddle.y,
-                direct: 0.6,
+                y: 240,
+                direct: 0.42,
                 // direct: (Math.random() - 0.5) / 2 + 0.5,
             })
         );

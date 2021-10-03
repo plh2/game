@@ -7,7 +7,7 @@ class AudioClass {
         this.init();
     }
     async init() {
-        var audio = new Audio('./hit.wav');
+        var audio = new Audio("./hit.wav");
         audio.play();
     }
 }
@@ -155,7 +155,7 @@ class Paddle {
 }
 
 class Ball {
-    constructor({ x, y, direct = Math.random() * 2, speed = 1, size = 7}) {
+    constructor({ x, y, direct = Math.random() * 2, speed = 1, size = 7 }) {
         this.x = x;
         this.y = y;
         // 0    →
@@ -192,10 +192,6 @@ class Ball {
         }
         return false;
     }
-    isLeft(a, b) {
-        // 判断点c是否在线段ab的左侧
-        return a.x;
-    }
     brickCollision() {
         this.direct += 2;
         this.direct %= 2;
@@ -224,22 +220,23 @@ class Ball {
                 // console.log(distance, ball.size);
                 // 1. reset ball position
                 // 2. turn around the ball position
-                // direct 向量
+                // direct angle
                 const d_x1 = Math.cos(this.direct * Math.PI);
                 const d_y1 = -Math.sin(this.direct * Math.PI);
-                const direct_1 = Math.atan2( -d_y1, d_x1)/Math.PI
-                // 法线 向量
+                const direct_1 = Math.atan2(-d_y1, d_x1) / Math.PI;
+                // surface angle
                 const d_x2 = (ball.x - closestPointX) / ball.size;
                 const d_y2 = (ball.y - closestPointY) / ball.size;
-                const direct_2 = Math.atan2(-d_y2, d_x2) / Math.PI
-                // direct 向量
-                ball.x = closestPointX + ball.size * Math.cos(direct_2*Math.PI);
-                ball.y = closestPointY - ball.size * Math.sin(direct_2*Math.PI);
-                function angleReflect(incidenceAngle, surfaceAngle){
+                const direct_2 = Math.atan2(-d_y2, d_x2) / Math.PI;
+                ball.x =
+                    closestPointX + ball.size * Math.cos(direct_2 * Math.PI);
+                ball.y =
+                    closestPointY - ball.size * Math.sin(direct_2 * Math.PI);
+                function angleReflect(incidenceAngle, surfaceAngle) {
                     const a = surfaceAngle * 2 - incidenceAngle;
                     return a >= 2 ? a - 2 : a < 0 ? a + 2 : a;
                 }
-                this.direct = angleReflect(direct_1, direct_2+0.5);
+                this.direct = angleReflect(direct_1, direct_2 + 0.5);
                 new AudioClass();
                 if (brick.level > 1) {
                     brick.level--;
@@ -349,7 +346,7 @@ root = {
         });
     },
     isWin() {
-        if (this.data.bricks.filter(e=>e.level<10).length === 0) {
+        if (this.data.bricks.filter((e) => e.level < 10).length === 0) {
             clearInterval(this.data.timer);
             alert("you win");
         }

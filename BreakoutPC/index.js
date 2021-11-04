@@ -155,7 +155,7 @@ class Paddle {
 }
 
 class Ball {
-    constructor({ x, y, direct = Math.random() * 2, speed = 1, size = 7 }) {
+    constructor({ x, y, direct = Math.random() * 2, speed = 10, size = 7 }) {
         this.x = x;
         this.y = y;
         // 0    →
@@ -308,7 +308,6 @@ root = {
         width: 1100,
         height: 600,
         paddle: null,
-        timer: null,
     },
     async initMap() {
         let data = localStorage.getItem(this.constants.BRICKS_MAP);
@@ -319,6 +318,7 @@ root = {
                 data.json()
             );
         }
+        this.data.bricks = []
         data.forEach((e) =>
             this.data.bricks.push(new Brick(e.x, e.y, e.level, e.size))
         );
@@ -332,33 +332,35 @@ root = {
         this.addBall();
         canvas.width = this.data.width;
         canvas.height = this.data.height;
-        this.data.timer = setInterval(() => {
-            this.drawBackground();
-            this.ballMove();
-            this.drawBrick();
-            this.drawFood();
-            this.data.paddle.draw();
-            this.isWin();
-            this.isLost();
-        }, this.data.refreshSpeed);
-        window.addEventListener("beforeunload", function (event) {
-            clearInterval(this.data.timer);
-        });
+        function eventLoop() {
+            root.drawBackground();
+            root.ballMove();
+            root.drawBrick();
+            root.drawFood();
+            root.data.paddle.draw();
+            if (!root.isWin() && !root.isLost()) {
+                requestAnimationFrame(eventLoop)
+            }
+        }
+        requestAnimationFrame(eventLoop)
     },
     isWin() {
-        if (this.data.bricks.filter((e) => e.level < 10).length === 0) {
-            clearInterval(this.data.timer);
+        if (root.data.bricks.filter((e) => e.level < 10).length === 0) {
             alert("you win");
+            this.data.balls = [];
+            this.data.foods = [];
+            return true
         }
+        return false
     },
     isLost() {
         if (this.data.balls.length === 0) {
-            clearInterval(this.data.timer);
             this.data.balls = [];
-            this.data.bricks = [];
             this.data.foods = [];
             this.init();
+            return true
         }
+        return false
     },
     drawBackground() {
         ctx.beginPath();
@@ -394,7 +396,7 @@ root = {
                 // direct: 0.73,
                 // direct: 0.03,
                 size: 5,
-                speed: 1,
+                speed: 3,
                 direct: (Math.random() - 0.5) / 2 + 0.5,
             })
         );
